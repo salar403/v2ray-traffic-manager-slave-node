@@ -9,6 +9,8 @@ from backend.environments import (
     RABBITMQ_QUEUE,
 )
 
+from traffic.tasks import update_config
+
 
 class Command(BaseCommand):
     help = "checks users vpn usages"
@@ -36,8 +38,7 @@ class Command(BaseCommand):
         channel.start_consuming()
 
     def callback(self, ch, method, properties, body):
+        update_config.apply_async(args=(body))
         print("Received new message")
         data = json.loads(body)
         print(data)
-
-        

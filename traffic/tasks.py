@@ -17,3 +17,8 @@ def retrieve_traffic():
         if data2.decode("utf-8") != '':
             usage += int(data2.decode("utf-8"))
     return usage
+
+
+@shared_task(queue="main")
+def update_config(config):
+    print(config)
