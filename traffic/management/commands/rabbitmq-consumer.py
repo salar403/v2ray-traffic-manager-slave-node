@@ -13,9 +13,8 @@ from traffic.tasks import update_config
 
 
 class Command(BaseCommand):
-    help = "checks users vpn usages"
-
     def handle(self, *args, **options):
+        print("Starting consumer...")
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=RABBITMQ_HOST,
@@ -29,12 +28,14 @@ class Command(BaseCommand):
                 blocked_connection_timeout=300,
             )
         )
+        print("creating channel...")
         channel = connection.channel()
+        print("declaring queue...")
         channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
         channel.basic_consume(
             queue=RABBITMQ_QUEUE, on_message_callback=self.callback, auto_ack=True
         )
-        print("Started Consuming...")
+        print("Starting Consuming...")
         channel.start_consuming()
 
     def callback(self, ch, method, properties, body):

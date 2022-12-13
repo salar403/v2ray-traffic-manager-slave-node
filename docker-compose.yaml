@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  celery-main:
+    container_name: celery-main
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      REDIS_HOST: "redis-slave"
+    command: celery -A backend worker -l info -c 2 -Q main
+    networks:
+      - slave-network
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      REDIS_HOST: "redis-slave"
+    command: celery -A backend beat -l info
+    depends_on:
+      - celery-main
+    networks:
+      - slave-network
+
+  rabbitmq-consumer:
+    container_name: rabbitmq-consumer
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      REDIS_HOST: "redis-slave"
+    command: python3 manage.py rabbitmq-consumer
+    networks:
+      - slave-network
+
+networks:
+  slave-network:
+    external: True
