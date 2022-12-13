@@ -1,0 +1,16 @@
+# *.sqlite3
+.env/
+venv/
+.idea/
+*.pyc
+media
+**/__pycache__/
+**/__pycache__/*
+.DS_Store
+.vscode/
+classes.dot
+db.sqlite3
+celerybeat-schedule
+.coverage
+**/*.log
+redis-data/
