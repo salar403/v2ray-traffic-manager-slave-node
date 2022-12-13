@@ -39,7 +39,7 @@ class Command(BaseCommand):
         channel.start_consuming()
 
     def callback(self, ch, method, properties, body):
-        update_config.apply_async(args=(body))
         print("Received new message")
         data = json.loads(body)
+        update_config.apply_async(kwargs={"config":data})
         print(data)
