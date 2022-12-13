@@ -7,11 +7,11 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.conf.result_expires = 180
 
 app.conf.beat_schedule = {
-    "update_traffic_usages": {
-        "task": "traffic.tasks.retrieve_traffic",
-        "schedule": 1.0,
-        "options": {"queue": "main"},
-    },
+    # "update_traffic_usages": {
+    #     "task": "traffic.tasks.retrieve_traffic",
+    #     "schedule": 1.0,
+    #     "options": {"queue": "main"},
+    # },
 }
 
 app.conf.timezone = "UTC"
