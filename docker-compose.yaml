@@ -5,7 +5,7 @@ services:
     container_name: celery-main
     build:
       context: '.'
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.backend
     restart: always
     environment:
       REDIS_HOST: "redis-slave"
@@ -17,7 +17,7 @@ services:
     container_name: celery-beat
     build:
       context: '.'
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.backend
     restart: always
     environment:
       REDIS_HOST: "redis-slave"
@@ -31,13 +31,24 @@ services:
     container_name: rabbitmq-consumer
     build:
       context: '.'
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.backend
     restart: always
     environment:
       REDIS_HOST: "redis-slave"
     command: python3 manage.py rabbitmq-consumer
     networks:
       - slave-network
+
+  v2ray:
+    container_name: v2ray
+    restart: always
+    build:
+      context: '.'
+      dockerfile: "./Dockerfile.v2ray"
+    ports:
+      - 80:80
+    volumes:
+      - ./config.json:/config.json
 
 networks:
   slave-network:
