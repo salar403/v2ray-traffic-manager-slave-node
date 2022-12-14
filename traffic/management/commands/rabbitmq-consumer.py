@@ -31,10 +31,8 @@ class Command(BaseCommand):
         print("creating channel...")
         channel = connection.channel()
         print("declaring queue...")
-        channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
-        channel.basic_consume(
-            queue=RABBITMQ_QUEUE, on_message_callback=self.callback, auto_ack=True
-        )
+        channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True, arguments={"x-queue-type":"stream"})
+        channel.basic_qos(prefetch_count=1000)
         print("Starting Consuming...")
         channel.start_consuming()
 
