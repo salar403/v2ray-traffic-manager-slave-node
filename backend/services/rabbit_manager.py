@@ -18,6 +18,10 @@ class ProducerSingleton:
     def get_channel():
         if ProducerSingleton.__channel is None:
             ProducerSingleton()
+        else:
+            if not ProducerSingleton.__channel.is_open:
+                ProducerSingleton.__channel = None
+                ProducerSingleton()
         return ProducerSingleton.__channel
 
     def __init__(self):
@@ -48,7 +52,6 @@ class ProducerSingleton:
         channel = ProducerSingleton.get_channel()
         channel.close()
         ProducerSingleton.__channel = None
-
 
 def publish(body: any, routing_key: str = USAGE_ROUTING_KEY):
     channel = ProducerSingleton.get_channel()

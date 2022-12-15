@@ -1,17 +1,32 @@
 version: '3.3'
 
 services:
+
+  redis-slave:
+    container_name: redis-slave
+    restart: always
+    image: redis:6.2.7
+    volumes:
+      - redis-slave-data:/data
+    networks:
+      - slave-network
+
   celery-main:
     container_name: celery-main
     build:
       context: '.'
-      dockerfile: ./Dockerfile.backend
+      dockerfile: ./Dockerfile.celery
     restart: always
     environment:
       REDIS_HOST: "redis-slave"
+      V2RAY_HOST: "v2ray"
     command: celery -A backend worker -l info -c 2 -Q main
     networks:
       - slave-network
+    depends_on:
+      - redis-slave
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   celery-beat:
     container_name: celery-beat
@@ -21,6 +36,7 @@ services:
     restart: always
     environment:
       REDIS_HOST: "redis-slave"
+      V2RAY_HOST: "v2ray"
     command: celery -A backend beat -l info
     depends_on:
       - celery-main
@@ -35,9 +51,12 @@ services:
     restart: always
     environment:
       REDIS_HOST: "redis-slave"
-    command: python3 manage.py rabbitmq-consumer
+      V2RAY_HOST: "v2ray"
+    command: ./manage.py rabbitmq-consumer
     networks:
       - slave-network
+    depends_on:
+      - redis-slave
 
   v2ray:
     container_name: v2ray
@@ -49,7 +68,13 @@ services:
       - 80:80
     volumes:
       - ./config.json:/config.json
+    networks:
+      - slave-network
 
 networks:
   slave-network:
+    external: True
+
+volumes:
+  redis-slave-data:
     external: True

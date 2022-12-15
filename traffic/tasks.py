@@ -1,8 +1,9 @@
-import subprocess
+import json
+import subprocess, os
 from celery import shared_task
 
 @shared_task(queue="main")
-def retrieve_traffic():
+def retrieve_traffic(user):
     usage= 0
     data1=None
     data2=None
@@ -20,5 +21,10 @@ def retrieve_traffic():
 
 
 @shared_task(queue="main")
-def update_config(config):
-    print(config)
+def update_config(config:dict):
+    if not isinstance(config, dict) or len(list(config)) == 0:
+        raise ValueError(f"invalid config file recieved! \n {config}")
+    with open("config.json","w") as out:
+        json.dump(config,out)
+    os.system("docker restart v2ray")
+
