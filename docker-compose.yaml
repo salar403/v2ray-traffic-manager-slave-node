@@ -67,8 +67,8 @@ services:
       - 443:443
     volumes:
       - ./config.json:/etc/xray/config.json
-      - ./root/v2/host.crt:/host.crt
-      - ./root/v2/host.key:/host.key
+      - /root/cert/host.crt:/host.crt
+      - /root/cert/host.key:/host.key
     networks:
       - slave-network
 
