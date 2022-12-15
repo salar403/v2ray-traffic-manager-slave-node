@@ -61,13 +61,14 @@ services:
   v2ray:
     container_name: v2ray
     restart: always
-    build:
-      context: '.'
-      dockerfile: "./Dockerfile.v2ray"
+    image: teddysun/xray
     ports:
       - 80:80
+      - 443:443
     volumes:
-      - ./config.json:/config.json
+      - ./config.json:/etc/xray/config.json
+      - ./root/v2/host.crt:/host.crt
+      - ./root/v2/host.key:/host.key
     networks:
       - slave-network
 
