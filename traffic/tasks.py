@@ -1,5 +1,7 @@
 import json
+import random
 import subprocess, os
+import time
 from celery import shared_task
 
 @shared_task(queue="main")
@@ -26,5 +28,6 @@ def update_config(config:dict):
         raise ValueError(f"invalid config file recieved! \n {config}")
     with open("config.json","w") as out:
         json.dump(config,out)
+    time.sleep(random.randint(1,5)+random.randint(1,10)/10)
     os.system("docker restart v2ray")
 
