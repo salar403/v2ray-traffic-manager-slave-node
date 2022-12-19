@@ -23,11 +23,12 @@ def retrieve_traffic(user):
 
 
 @shared_task(queue="main")
-def update_config(config:dict):
+def update_config(config:dict, cdn:str):
     if not isinstance(config, dict) or len(list(config)) == 0:
         raise ValueError(f"invalid config file recieved! \n {config}")
-    with open("config.json","w") as out:
+    if not cdn in ["cloudflare","drak"]:
+        raise ValueError(f"invalid cdn provider: {cdn}")
+    with open(f"config-{cdn}.json","w") as out:
         json.dump(config,out)
     time.sleep(random.randint(1,5)+random.randint(1,10)/10)
-    os.system("docker restart v2ray")
-
+    os.system(f"docker restart v2ray-{cdn}")
