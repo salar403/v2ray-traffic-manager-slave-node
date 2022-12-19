@@ -58,17 +58,34 @@ services:
     depends_on:
       - redis-slave
 
-  v2ray:
-    container_name: v2ray
-    restart: always
-    image: teddysun/xray
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    image: nginx:1.23.1
+    volumes:
+      - ./nginx-conf/:/etc/nginx/:ro
+      - /root/cert:/ssl/:ro
     ports:
       - 80:80
       - 443:443
+    networks:
+      - backend-network
+
+  v2ray-drak:
+    container_name: v2ray-drak
+    restart: always
+    image: teddysun/xray
     volumes:
-      - ./config.json:/etc/xray/config.json
-      - /root/cert/host.crt:/host.crt
-      - /root/cert/host.key:/host.key
+      - ./config.json:/etc/xray/config-drakjson
+    networks:
+      - slave-network
+
+  v2ray-cloudflare:
+    container_name: v2ray-cloudflare
+    restart: always
+    image: teddysun/xray
+    volumes:
+      - ./config.json:/etc/xray/config-cloudflare.json
     networks:
       - slave-network
 
